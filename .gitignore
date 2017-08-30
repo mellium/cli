@@ -1,0 +1,6 @@
+*.sw[op]
+*.svg
+*.xml
+*.out
+vendor/
+Gopkg.lock
