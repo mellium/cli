@@ -11,6 +11,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -75,4 +76,59 @@ func (c *Command) ShortDesc() string {
 		return c.Description
 	}
 	return c.Description[:idx]
+}
+
+// CommandSet is a set of application subcommands and application level flags.
+type CommandSet struct {
+	Name     string
+	Flags    *flag.FlagSet
+	Commands []*Command
+}
+
+// Run attempts to run the command in the CommandSet that matches the first
+// argument passed in.
+// If no arguments are passed in, run prints help information to stdout.
+// If the first argument does not match a command in the CommandSet, run prints
+// the same help information to stderr.
+func (cs *CommandSet) Run(args ...string) error {
+	if len(args) == 0 || cs == nil {
+		cs.Help(os.Stderr)
+		return nil
+	}
+	for _, cmd := range cs.Commands {
+		if cmd.Name() != args[0] {
+			continue
+		}
+
+		return cmd.Run(cmd, args[1:]...)
+	}
+	cs.Help(os.Stderr)
+	return nil
+}
+
+// Help prints a usage line for the command set and a list of commands to the
+// provided writer.
+func (cs *CommandSet) Help(w io.Writer) {
+	if cs == nil {
+		return
+	}
+	fmt.Fprintf(w, "Usage of %s:\n\n", cs.Name)
+	fmt.Fprintf(w, "%s [options] command\n\n", cs.Name)
+	if cs.Flags != nil {
+		cs.Flags.SetOutput(w)
+		cs.Flags.PrintDefaults()
+	}
+	fmt.Fprint(w, "\nCommands:\n\n")
+	printCmds(w, cs.Commands...)
+}
+
+func printCmds(w io.Writer, commands ...*Command) {
+	for _, command := range commands {
+		name := command.Name()
+		if short := command.ShortDesc(); short != "" {
+			fmt.Fprintf(w, "\t%s\t%s\n", name, short)
+			continue
+		}
+		fmt.Fprintf(w, "\t%s", name)
+	}
 }
