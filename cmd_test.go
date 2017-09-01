@@ -100,18 +100,16 @@ func TestCommandSet(t *testing.T) {
 			}
 			os.Stderr = stderr
 		})
-		t.Run(fmt.Sprintf("Help/%d", i), func(t *testing.T) {
-			if tc.cs == nil {
-				return
-			}
-
-			b := new(bytes.Buffer)
-			tc.cs.Help(b)
-			for _, cmd := range tc.cs.Commands {
-				if !bytes.Contains(b.Bytes(), []byte(cmd.Name())) {
-					t.Errorf("Expected commandset help to contain command name: %s", cmd.Name())
+		if tc.cs != nil {
+			t.Run(fmt.Sprintf("Help/%d", i), func(t *testing.T) {
+				b := new(bytes.Buffer)
+				tc.cs.Help(b)
+				for _, cmd := range tc.cs.Commands {
+					if !bytes.Contains(b.Bytes(), []byte(cmd.Name())) {
+						t.Errorf("Expected commandset help to contain command name: %s", cmd.Name())
+					}
 				}
-			}
-		})
+			})
+		}
 	}
 }

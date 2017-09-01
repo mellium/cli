@@ -6,7 +6,6 @@ package cli_test
 
 import (
 	"flag"
-	"fmt"
 	"os"
 
 	"mellium.im/cli"
@@ -14,18 +13,17 @@ import (
 
 func commitCmd() *cli.Command {
 	commitFlags := flag.NewFlagSet("commit", flag.ExitOnError)
-	all := commitFlags.Bool("a", false, "Tell the command to automatically stage files…")
+	help := commitFlags.Bool("h", false, "Print this commands help output…")
 	return &cli.Command{
-		Usage: `commit [-a] …`,
+		Usage: `commit [-h] …`,
 		Description: `Records changes to the repository.
 
 Stores the current contents of the index in a new commit…`,
 		Flags: commitFlags,
 		Run: func(c *cli.Command, args ...string) error {
 			commitFlags.Parse(args)
-			fmt.Println("Ran commit!")
-			if *all {
-				fmt.Println("-a flag was used")
+			if *help {
+				c.Help(os.Stdout)
 			}
 			return nil
 		},
@@ -33,15 +31,20 @@ Stores the current contents of the index in a new commit…`,
 }
 
 func Example() {
-	commit := commitCmd()
-	commit.Help(os.Stdout)
+	cmds := &cli.CommandSet{
+		Name: "git",
+		Commands: []*cli.Command{
+			commitCmd(),
+		},
+	}
+	cmds.Run("commit", "-h")
 
 	// Output:
-	// Usage: commit [-a] …
+	// Usage: commit [-h] …
 	//
 	// Options:
 	//
-	//   -a	Tell the command to automatically stage files…
+	//   -h	Print this commands help output…
 	//
 	// Records changes to the repository.
 	//
