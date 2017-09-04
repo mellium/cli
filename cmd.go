@@ -4,7 +4,16 @@
 
 // Package cli can be used to create modern command line interfaces.
 //
-// To create a subcommand create and run an instance of the Command type.
+// User interfaces created with Command and CommandSet take the form of the
+// application, followed by an optional set of application level flags, followed
+// by a subcommand which may be followed by its own subcommand specific flags.
+//
+// For instance, if recreating the "git" command it might have a subcommand
+// called "commit":
+//
+//     git -config mygit.config commit -interactive
+//
+// See the examples for the definition of this command.
 package cli // import "mellium.im/cli"
 
 import (
