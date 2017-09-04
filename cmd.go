@@ -73,9 +73,9 @@ func (c *Command) Name() string {
 // ShortDesc returns the first line of c.Description.
 // For example, given the description:
 //
-//     This is a command with super.
+//     Stores the current contents of the index.
 //
-//     The content to be added can be specified in several ways:
+//     The content to be added can be specified in several ways: …
 //
 // ShortDescr returns "Stores the current contents of the index."
 func (c *Command) ShortDesc() string {
