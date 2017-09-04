@@ -25,6 +25,7 @@ Stores the current contents of the index in a new commit…`,
 		Flags: commitFlags,
 		Run: func(c *cli.Command, args ...string) error {
 			commitFlags.Parse(args)
+			fmt.Printf("Using config file: %s\n", cfg)
 			if *interactive {
 				fmt.Println("Interactive mode enabled.")
 			}
@@ -52,6 +53,7 @@ func Example() {
 	cmds.Run(globalFlags.Args()...)
 
 	// Output:
+	// Using config file: mygit.config
 	// Interactive mode enabled.
 	// Usage: commit [-h] …
 	//
