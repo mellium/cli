@@ -22,7 +22,7 @@ type testCase struct {
 	desc string
 }
 
-var testCases = [...]testCase{
+var commandTestCases = [...]testCase{
 	0: {},
 	1: {cmd: cli.Command{Usage: "name", Description: "desc"}, name: "name", desc: "desc"},
 	2: {cmd: cli.Command{Usage: "name [options]", Description: "desc\nlong description"}, name: "name", desc: "desc"},
@@ -30,7 +30,7 @@ var testCases = [...]testCase{
 
 func TestCommand(t *testing.T) {
 	b := new(bytes.Buffer)
-	for i, tc := range testCases {
+	for i, tc := range commandTestCases {
 		t.Run(fmt.Sprintf("Name/%d", i), func(t *testing.T) {
 			if name := tc.cmd.Name(); name != tc.name {
 				t.Errorf("Invalid name: want=`%s`, got=`%s`", tc.name, name)
@@ -47,7 +47,7 @@ func TestCommand(t *testing.T) {
 
 			b.Reset()
 			tc.cmd.Help(b)
-			if !bytes.Contains(b.Bytes(), []byte(tc.cmd.Usage)) {
+			if tc.cmd.Run != nil && !bytes.Contains(b.Bytes(), []byte(tc.cmd.Usage)) {
 				t.Errorf("Expected cmd.Help() output to contain cmd.Usage")
 			}
 			if !bytes.Contains(b.Bytes(), []byte(tc.cmd.Description)) {

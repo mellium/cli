@@ -39,6 +39,7 @@ type Command struct {
 
 	// The action to take when this command is executed. The args will be the
 	// remaining command line args after all flags have been parsed.
+	// Run is normally called by a CommandSet and shouldn't be called directly.
 	Run func(c *Command, args ...string) error
 }
 
@@ -46,7 +47,9 @@ type Command struct {
 // provided io.Writer.
 // If c.Flags is a valid flag set, calling Help sets the output of c.Flags.
 func (c *Command) Help(w io.Writer) {
-	fmt.Fprintf(w, "Usage: %s\n\n", c.Usage)
+	if c.Run != nil {
+		fmt.Fprintf(w, "Usage: %s\n\n", c.Usage)
+	}
 	if c.Flags != nil {
 		fmt.Fprint(w, "Options:\n\n")
 		c.Flags.SetOutput(w)
@@ -108,6 +111,10 @@ func (cs *CommandSet) Run(args ...string) error {
 			continue
 		}
 
+		if cmd.Run == nil {
+			cmd.Help(os.Stdout)
+			return nil
+		}
 		return cmd.Run(cmd, args[1:]...)
 	}
 	cs.Help(os.Stderr)
@@ -126,12 +133,31 @@ func (cs *CommandSet) Help(w io.Writer) {
 		cs.Flags.SetOutput(w)
 		cs.Flags.PrintDefaults()
 	}
-	fmt.Fprint(w, "\nCommands:\n\n")
 	printCmds(w, cs.Commands...)
 }
 
 func printCmds(w io.Writer, commands ...*Command) {
+	fmt.Fprint(w, "Commands:\n\n")
 	for _, command := range commands {
+		if command.Run == nil {
+			continue
+		}
+		name := command.Name()
+		if short := command.ShortDesc(); short != "" {
+			fmt.Fprintf(w, "\t%s\t%s\n", name, short)
+			continue
+		}
+		fmt.Fprintf(w, "\t%s\n", name)
+	}
+	found := false
+	for _, command := range commands {
+		if command.Run != nil {
+			continue
+		}
+		if !found {
+			fmt.Fprint(w, "\nArticles:\n\n")
+		}
+		found = true
 		name := command.Name()
 		if short := command.ShortDesc(); short != "" {
 			fmt.Fprintf(w, "\t%s\t%s\n", name, short)

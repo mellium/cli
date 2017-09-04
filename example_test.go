@@ -18,7 +18,7 @@ func commitCmd(cfg string) *cli.Command {
 	interactive := commitFlags.Bool("interactive", false, "Run commit in interactive mode.")
 
 	return &cli.Command{
-		Usage: `commit [-h] …`,
+		Usage: `commit [-h] [-interactive] …`,
 		Description: `Records changes to the repository.
 
 Stores the current contents of the index in a new commit…`,
@@ -41,7 +41,7 @@ func Example() {
 	globalFlags := flag.NewFlagSet("git", flag.ExitOnError)
 	cfg := globalFlags.String("config", "gitconfig", "A custom config file to load")
 
-	// TODO: os.Args[1:]
+	// In a real main function, this would probably be os.Args[1:]
 	globalFlags.Parse([]string{"-config", "mygit.config", "commit", "-interactive", "-h"})
 
 	cmds := &cli.CommandSet{
@@ -55,7 +55,7 @@ func Example() {
 	// Output:
 	// Using config file: mygit.config
 	// Interactive mode enabled.
-	// Usage: commit [-h] …
+	// Usage: commit [-h] [-interactive] …
 	//
 	// Options:
 	//
