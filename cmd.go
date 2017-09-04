@@ -5,11 +5,10 @@
 // Package cli can be used to create modern command line interfaces.
 //
 // User interfaces created with Command and CommandSet take the form of the
-// application, followed by an optional set of application level flags, followed
-// by a subcommand which may be followed by its own subcommand specific flags.
-//
+// application name followed by the subcommand which may do its own parsing on
+// all arguments after it.
 // For instance, if recreating the "git" command it might have a subcommand
-// called "commit":
+// called "commit" and each could have their own flags:
 //
 //     git -config mygit.config commit -interactive
 //
