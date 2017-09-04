@@ -48,7 +48,7 @@ type Command struct {
 func (c *Command) Help(w io.Writer) {
 	fmt.Fprintf(w, "Usage: %s\n\n", c.Usage)
 	if c.Flags != nil {
-		fmt.Fprintln(w, "Options:\n")
+		fmt.Fprint(w, "Options:\n\n")
 		c.Flags.SetOutput(w)
 		c.Flags.PrintDefaults()
 	}
