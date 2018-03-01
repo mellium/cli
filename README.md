@@ -3,6 +3,8 @@
 [![GoDoc](https://godoc.org/mellium.im/cli?status.svg)](https://godoc.org/mellium.im/cli)
 [![License](https://img.shields.io/badge/license-FreeBSD-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
+[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png)](https://www.buymeacoffee.com/samwhited)
+
 A simple library for writing applications with a command line interface.
 
 ```go
