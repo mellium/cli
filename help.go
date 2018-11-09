@@ -36,7 +36,7 @@ func Help(cs *CommandSet) *Command {
 				cmd.Help(os.Stdout)
 				return nil
 			}
-			return fmt.Errorf("No such help topic %s\n", args[0])
+			return fmt.Errorf("no such help topic %s", args[0])
 		},
 	}
 }
