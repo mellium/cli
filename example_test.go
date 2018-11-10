@@ -12,10 +12,14 @@ import (
 	"mellium.im/cli"
 )
 
-func commitCmd(cfg string) *cli.Command {
+func commitCmd(cfg *string) *cli.Command {
 	commitFlags := flag.NewFlagSet("commit", flag.ExitOnError)
 	help := commitFlags.Bool("h", false, "Print this commands help output…")
 	interactive := commitFlags.Bool("interactive", false, "Run commit in interactive mode.")
+	if cfg == nil {
+		empty := ""
+		cfg = &empty
+	}
 
 	return &cli.Command{
 		Usage: `commit [-h] [-interactive] …`,
@@ -24,8 +28,7 @@ func commitCmd(cfg string) *cli.Command {
 Stores the current contents of the index in a new commit…`,
 		Flags: commitFlags,
 		Run: func(c *cli.Command, args ...string) error {
-			commitFlags.Parse(args)
-			fmt.Printf("Using config file: %s\n", cfg)
+			fmt.Printf("Using config file: %s\n", *cfg)
 			if *interactive {
 				fmt.Println("Interactive mode enabled.")
 			}
@@ -41,16 +44,16 @@ func Example() {
 	globalFlags := flag.NewFlagSet("git", flag.ExitOnError)
 	cfg := globalFlags.String("config", "gitconfig", "A custom config file to load")
 
-	// In a real main function, this would probably be os.Args[1:]
-	globalFlags.Parse([]string{"-config", "mygit.config", "commit", "-interactive", "-h"})
-
-	cmds := &cli.CommandSet{
-		Name: "git",
+	cmds := &cli.Command{
+		Usage: "git",
+		Flags: globalFlags,
 		Commands: []*cli.Command{
-			commitCmd(*cfg),
+			commitCmd(cfg),
 		},
 	}
-	cmds.Run(globalFlags.Args()...)
+
+	// In a real main function, this would probably be os.Args[1:]
+	cmds.Exec(os.Stdout, os.Stdout, "-config", "mygit.config", "commit", "-interactive", "-h")
 
 	// Output:
 	// Using config file: mygit.config

@@ -67,13 +67,13 @@ func TestCommand(t *testing.T) {
 }
 
 var csTestCase = [...]struct {
-	cs  *cli.CommandSet
+	cs  *cli.Command
 	run string
 	err error
 }{
 	0: {},
 	1: {
-		cs: &cli.CommandSet{
+		cs: &cli.Command{
 			Commands: []*cli.Command{
 				{Usage: "one [opts]"},
 				{Usage: "two [opts]"},
@@ -88,17 +88,14 @@ var csTestCase = [...]struct {
 func TestCommandSet(t *testing.T) {
 	for i, tc := range csTestCase {
 		t.Run(fmt.Sprintf("Run/%d", i), func(t *testing.T) {
-			stderr := os.Stderr
 			r, w, _ := os.Pipe()
-			os.Stderr = w
 			go io.Copy(ioutil.Discard, r)
-			if err := tc.cs.Run(); err != nil {
+			if err := tc.cs.Exec(ioutil.Discard, w); err != nil {
 				t.Errorf("Expected nil error when running with zero args, got=%v", err)
 			}
-			if err := tc.cs.Run(tc.run + " " + "arg1 " + "arg2"); err != tc.err {
+			if err := tc.cs.Exec(ioutil.Discard, w, tc.run+" "+"arg1 "+"arg2"); err != tc.err {
 				t.Errorf("Wrong err when running with args, want='%v', got='%v'", tc.err, err)
 			}
-			os.Stderr = stderr
 		})
 		if tc.cs != nil {
 			t.Run(fmt.Sprintf("Help/%d", i), func(t *testing.T) {

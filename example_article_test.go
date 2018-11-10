@@ -6,6 +6,7 @@ package cli_test
 
 import (
 	"fmt"
+	"os"
 
 	"mellium.im/cli"
 )
@@ -25,25 +26,23 @@ only exist so that their description can be shown using the help command
 }
 
 func Example_articles() {
-	cmds := &cli.CommandSet{
-		Name: "git",
+	cmds := &cli.Command{
+		Usage: "git <command>",
 		Commands: []*cli.Command{
-			commitCmd(""),
+			commitCmd(nil),
 			articleHelp(),
 		},
 	}
 	cmds.Commands = append(cmds.Commands, cli.Help(cmds))
 	fmt.Println("$ git help")
-	cmds.Run("help")
+	cmds.Exec(os.Stdout, os.Stdout, "help")
 
-	fmt.Println("$ git help article")
-	cmds.Run("help", "article")
+	fmt.Print("$ git help article\n\n")
+	cmds.Exec(os.Stdout, os.Stdout, "help", "article")
 
 	// Output:
 	// $ git help
-	// Usage of git:
-	//
-	// git [options] command
+	// Usage: git <command>
 	//
 	// Commands:
 	//

@@ -19,7 +19,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
@@ -37,6 +36,9 @@ type Command struct {
 	// subcommand.
 	Flags *flag.FlagSet
 
+	// Commands is a set of subcommands.
+	Commands []*Command
+
 	// The action to take when this command is executed. The args will be the
 	// remaining command line args after all flags have been parsed.
 	// Run is normally called by a CommandSet and shouldn't be called directly.
@@ -47,16 +49,23 @@ type Command struct {
 // provided io.Writer.
 // If c.Flags is a valid flag set, calling Help sets the output of c.Flags.
 func (c *Command) Help(w io.Writer) {
-	if c.Run != nil {
+	if c == nil {
+		return
+	}
+	// If there is a usage line and it's more than just the name, print it.
+	if c.Usage != "" && c.Name() != c.Usage {
 		fmt.Fprintf(w, "Usage: %s\n\n", c.Usage)
 	}
 	if c.Flags != nil {
 		fmt.Fprint(w, "Options:\n\n")
 		c.Flags.SetOutput(w)
 		c.Flags.PrintDefaults()
+		fmt.Fprintln(w, "")
 	}
-	fmt.Fprintln(w, "")
-	fmt.Fprintln(w, c.Description)
+	if c.Description != "" {
+		fmt.Fprintln(w, c.Description)
+	}
+	printCmds(w, c.Commands...)
 }
 
 // Name returns the first word of c.Usage which will be the name of the command.
@@ -89,54 +98,52 @@ func (c *Command) ShortDesc() string {
 	return c.Description[:idx]
 }
 
-// CommandSet is a set of application subcommands and application level flags.
-type CommandSet struct {
-	Name     string
-	Flags    *flag.FlagSet
-	Commands []*Command
-}
-
-// Run attempts to run the command in the CommandSet that matches the first
-// argument passed in.
-// If no arguments are passed in, run prints help information to stdout.
-// If the first argument does not match a command in the CommandSet, run prints
-// the same help information to stderr.
-func (cs *CommandSet) Run(args ...string) error {
-	if len(args) == 0 || cs == nil {
-		cs.Help(os.Stderr)
+// Exec attempts to run the command that matches the first argument passed in
+// (or the current command if no command name is provided and a Run function has
+// been specified).
+// It parses unparsed flags for each subcommand it encounters.
+// If no command matches help information is written to stderr.
+// If a command matches, there are remaining arguments after flag parsing
+// completes, and no Run function is provided, help information is written to
+// stdout.
+func (c *Command) Exec(stdout, stderr io.Writer, args ...string) error {
+	if c == nil {
 		return nil
 	}
-	for _, cmd := range cs.Commands {
+	if c.Flags != nil {
+		if !c.Flags.Parsed() {
+			err := c.Flags.Parse(args)
+			if err != nil {
+				return err
+			}
+		}
+		args = c.Flags.Args()
+	}
+	if len(args) == 0 {
+		if c.Run != nil {
+			return c.Run(c)
+		}
+		c.Help(stdout)
+		return nil
+	}
+	for _, cmd := range c.Commands {
 		if cmd.Name() != args[0] {
 			continue
 		}
 
-		if cmd.Run == nil {
-			cmd.Help(os.Stdout)
-			return nil
-		}
-		return cmd.Run(cmd, args[1:]...)
+		return cmd.Exec(stdout, stderr, args[1:]...)
 	}
-	cs.Help(os.Stderr)
+	if c.Run != nil {
+		return c.Run(c, args...)
+	}
+	c.Help(stderr)
 	return nil
 }
 
-// Help prints a usage line for the command set and a list of commands to the
-// provided writer.
-func (cs *CommandSet) Help(w io.Writer) {
-	if cs == nil {
+func printCmds(w io.Writer, commands ...*Command) {
+	if len(commands) == 0 {
 		return
 	}
-	fmt.Fprintf(w, "Usage of %s:\n\n", cs.Name)
-	fmt.Fprintf(w, "%s [options] command\n\n", cs.Name)
-	if cs.Flags != nil {
-		cs.Flags.SetOutput(w)
-		cs.Flags.PrintDefaults()
-	}
-	printCmds(w, cs.Commands...)
-}
-
-func printCmds(w io.Writer, commands ...*Command) {
 	fmt.Fprint(w, "Commands:\n\n")
 	for _, command := range commands {
 		if command.Run == nil {

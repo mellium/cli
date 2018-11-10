@@ -5,23 +5,23 @@
 package cli_test
 
 import (
+	"os"
+
 	"mellium.im/cli"
 )
 
 func ExampleHelp() {
-	cmds := &cli.CommandSet{
-		Name: "git",
+	cmds := &cli.Command{
+		Usage: "git [options] command",
 	}
 	cmds.Commands = []*cli.Command{
-		commitCmd(""),
+		commitCmd(nil),
 		cli.Help(cmds),
 	}
-	cmds.Run("help")
+	cmds.Exec(os.Stdout, os.Stdout, "help")
 
 	// Output:
-	// Usage of git:
-	//
-	// git [options] command
+	// Usage: git [options] command
 	//
 	// Commands:
 	//

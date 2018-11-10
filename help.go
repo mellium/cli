@@ -17,7 +17,7 @@ import (
 //     git help commit
 //
 // would print information about the "commit" subcommand.
-func Help(cs *CommandSet) *Command {
+func Help(cs *Command) *Command {
 	return &Command{
 		Usage:       "help [command]",
 		Description: `Print articles and detailed information about subcommands.`,
@@ -33,10 +33,16 @@ func Help(cs *CommandSet) *Command {
 				if cmd.Name() != args[0] {
 					continue
 				}
-				cmd.Help(os.Stdout)
-				return nil
+				// If this is the article, run its help command.
+				if len(args) == 1 {
+					cmd.Help(os.Stdout)
+					return nil
+				}
+
+				// Recurse into subcommands:
+				return Help(cmd).Run(cmd, args[1:]...)
 			}
-			return fmt.Errorf("no such help topic %s", args[0])
+			return fmt.Errorf("unknown help topic")
 		},
 	}
 }
