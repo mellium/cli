@@ -18,30 +18,26 @@ func Example_subcommands() {
 			fmt.Println("Ran go")
 			return nil
 		},
-		Commands: []*cli.Command{
-			&cli.Command{
-				Usage: `mod <command> [arguments]`,
-				Description: `Go mod provides access to operations on modules.
+		Commands: []*cli.Command{{
+			Usage: `mod <command> [arguments]`,
+			Description: `Go mod provides access to operations on modules.
 
 Note that support for modules is built into all the go commands…`,
-				Run: func(c *cli.Command, args ...string) error {
-					fmt.Println("Ran go mod")
-					return nil
-				},
-				Commands: []*cli.Command{
-					&cli.Command{
-						Usage: `tidy [-v]`,
-						Description: `Add missing and remove unused modules.
+			Run: func(c *cli.Command, args ...string) error {
+				fmt.Println("Ran go mod")
+				return nil
+			},
+			Commands: []*cli.Command{{
+				Usage: `tidy [-v]`,
+				Description: `Add missing and remove unused modules.
 
 Tidy makes sure go.mod matches the source code in the module…`,
-						Run: func(c *cli.Command, args ...string) error {
-							fmt.Println("Ran go mod tidy")
-							return nil
-						},
-					},
+				Run: func(c *cli.Command, args ...string) error {
+					fmt.Println("Ran go mod tidy")
+					return nil
 				},
-			},
-		},
+			}},
+		}},
 	}
 	cmds.Commands = append(cmds.Commands, cli.Help(cmds))
 	fmt.Println("$ go help")
