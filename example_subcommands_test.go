@@ -6,7 +6,6 @@ package cli_test
 
 import (
 	"fmt"
-	"os"
 
 	"mellium.im/cli"
 )
@@ -41,22 +40,22 @@ Tidy makes sure go.mod matches the source code in the module…`,
 	}
 	cmds.Commands = append(cmds.Commands, cli.Help(cmds))
 	fmt.Println("$ go help")
-	cmds.Exec(os.Stdout, os.Stdout, "help")
+	cmds.Exec("help")
 
 	fmt.Print("$ go help mod\n\n")
-	cmds.Exec(os.Stdout, os.Stdout, "help", "mod")
+	cmds.Exec("help", "mod")
 
 	fmt.Print("$ go help mod tidy\n\n")
-	cmds.Exec(os.Stdout, os.Stdout, "help", "mod", "tidy")
+	cmds.Exec("help", "mod", "tidy")
 
 	fmt.Print("$ go\n\n")
-	cmds.Exec(os.Stdout, os.Stdout)
+	cmds.Exec()
 
 	fmt.Print("$ go mod\n\n")
-	cmds.Exec(os.Stdout, os.Stdout, "mod")
+	cmds.Exec("mod")
 
 	fmt.Print("$ go mod tidy\n\n")
-	cmds.Exec(os.Stdout, os.Stdout, "mod", "tidy")
+	cmds.Exec("mod", "tidy")
 
 	// Output:
 	// $ go help

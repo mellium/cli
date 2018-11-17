@@ -53,7 +53,7 @@ func Example() {
 	}
 
 	// In a real main function, this would probably be os.Args[1:]
-	cmds.Exec(os.Stdout, os.Stdout, "-config", "mygit.config", "commit", "-interactive", "-h")
+	cmds.Exec("-config", "mygit.config", "commit", "-interactive", "-h")
 
 	// Output:
 	// Using config file: mygit.config

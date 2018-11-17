@@ -6,7 +6,6 @@ package cli_test
 
 import (
 	"fmt"
-	"os"
 
 	"mellium.im/cli"
 )
@@ -35,10 +34,10 @@ func Example_articles() {
 	}
 	cmds.Commands = append(cmds.Commands, cli.Help(cmds))
 	fmt.Println("$ git help")
-	cmds.Exec(os.Stdout, os.Stdout, "help")
+	cmds.Exec("help")
 
 	fmt.Print("$ git help article\n\n")
-	cmds.Exec(os.Stdout, os.Stdout, "help", "article")
+	cmds.Exec("help", "article")
 
 	// Output:
 	// $ git help

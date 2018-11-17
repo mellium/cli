@@ -16,10 +16,16 @@
 package cli // import "mellium.im/cli"
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io"
 	"strings"
+)
+
+var (
+	ErrInvalidCmd = errors.New("cli: no such command")
+	ErrNoRun      = errors.New("cli: no run function was specified for the command")
 )
 
 // Command represents a new subcommand.
@@ -99,14 +105,13 @@ func (c *Command) ShortDesc() string {
 }
 
 // Exec attempts to run the command that matches the first argument passed in
-// (or the current command if no command name is provided and a Run function has
-// been specified).
+// (or the current command if the command has no name but does have a Run
+// function).
 // It parses unparsed flags for each subcommand it encounters.
-// If no command matches help information is written to stderr.
-// If a command matches, there are remaining arguments after flag parsing
-// completes, and no Run function is provided, help information is written to
-// stdout.
-func (c *Command) Exec(stdout, stderr io.Writer, args ...string) error {
+// If no command matches, ErrInvalidCmd is returned.
+// If a command matches and there are flags, but no run function has been
+// provided, ErrNoRun is returned.
+func (c *Command) Exec(args ...string) error {
 	if c == nil {
 		return nil
 	}
@@ -123,21 +128,23 @@ func (c *Command) Exec(stdout, stderr io.Writer, args ...string) error {
 		if c.Run != nil {
 			return c.Run(c)
 		}
-		c.Help(stdout)
-		return nil
+		return ErrNoRun
 	}
+	wantCmd := args[0]
 	for _, cmd := range c.Commands {
 		if cmd.Name() != args[0] {
 			continue
 		}
 
-		return cmd.Exec(stdout, stderr, args[1:]...)
+		return cmd.Exec(args[1:]...)
 	}
 	if c.Run != nil {
 		return c.Run(c, args...)
 	}
-	c.Help(stderr)
-	return nil
+	if wantCmd == c.Name() {
+		return ErrNoRun
+	}
+	return ErrInvalidCmd
 }
 
 func printCmds(w io.Writer, commands ...*Command) {

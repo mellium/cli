@@ -8,9 +8,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io"
-	"io/ioutil"
-	"os"
 	"testing"
 
 	"mellium.im/cli"
@@ -68,7 +65,7 @@ func TestCommand(t *testing.T) {
 
 var csTestCase = [...]struct {
 	cs  *cli.Command
-	run string
+	run []string
 	err error
 }{
 	0: {},
@@ -80,21 +77,49 @@ var csTestCase = [...]struct {
 				{Usage: "three [opts]"},
 			},
 		},
-		run: "ran",
-		err: nil,
+		run: []string{"one"},
+		err: cli.ErrNoRun,
+	},
+	2: {
+		cs: &cli.Command{
+			Commands: []*cli.Command{
+				{Usage: "one [opts]", Flags: func() *flag.FlagSet {
+					f := flag.NewFlagSet("one", flag.ExitOnError)
+					f.Bool("v", false, "verbose")
+					return f
+				}()},
+				{Usage: "two [opts]"},
+				{Usage: "three [opts]"},
+			},
+		},
+		run: []string{"one", "-v"},
+		err: cli.ErrNoRun,
+	},
+	3: {
+		cs: &cli.Command{
+			Commands: []*cli.Command{
+				{Usage: "one [opts]"},
+				{Usage: "two [opts]"},
+				{Usage: "three [opts]"},
+			},
+		},
+		run: []string{"one", "-v"},
+		err: cli.ErrInvalidCmd,
+	},
+	4: {
+		cs: &cli.Command{
+			Commands: []*cli.Command{},
+		},
+		run: []string{"ran"},
+		err: cli.ErrInvalidCmd,
 	},
 }
 
 func TestCommandSet(t *testing.T) {
 	for i, tc := range csTestCase {
 		t.Run(fmt.Sprintf("Run/%d", i), func(t *testing.T) {
-			r, w, _ := os.Pipe()
-			go io.Copy(ioutil.Discard, r)
-			if err := tc.cs.Exec(ioutil.Discard, w); err != nil {
-				t.Errorf("Expected nil error when running with zero args, got=%v", err)
-			}
-			if err := tc.cs.Exec(ioutil.Discard, w, tc.run+" "+"arg1 "+"arg2"); err != tc.err {
-				t.Errorf("Wrong err when running with args, want='%v', got='%v'", tc.err, err)
+			if err := tc.cs.Exec(tc.run...); err != tc.err {
+				t.Errorf("Wrong err: want='%v', got='%v'", tc.err, err)
 			}
 		})
 		if tc.cs != nil {
