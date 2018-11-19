@@ -4,7 +4,7 @@ packages:
 environment:
   GO111MODULE: 'on'
 sources:
-  - git@git.sr.ht:~samwhited/cli
+  - https://git.sr.ht/~samwhited/cli
 tasks:
   - test: |
       cd cli/
