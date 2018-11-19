@@ -1,0 +1,13 @@
+image: freebsd
+packages:
+  - go
+environment:
+  GO111MODULE: 'on'
+sources:
+  - git@git.sr.ht:~samwhited/cli
+tasks:
+  - test: |
+      cd cli/
+      go build
+      go vet ./...
+      go test -cover ./...
