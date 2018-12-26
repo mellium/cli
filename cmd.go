@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"os"
 	"strings"
 )
 
@@ -52,11 +53,15 @@ type Command struct {
 }
 
 // Help writes the usage line, flags, and description for the command to the
-// provided io.Writer.
-// If c.Flags is a valid flag set, calling Help sets the output of c.Flags.
-func (c *Command) Help(w io.Writer) {
+// flag set's output or to stdout if Flags is nil.
+func (c *Command) Help() {
 	if c == nil {
 		return
+	}
+
+	var w io.Writer = os.Stdout
+	if c.Flags != nil {
+		w = c.Flags.Output()
 	}
 	// If there is a usage line and it's more than just the name, print it.
 	if c.Usage != "" && c.Name() != c.Usage {
@@ -64,7 +69,6 @@ func (c *Command) Help(w io.Writer) {
 	}
 	if c.Flags != nil {
 		fmt.Fprint(w, "Options:\n\n")
-		c.Flags.SetOutput(w)
 		c.Flags.PrintDefaults()
 		fmt.Fprintln(w, "")
 	}

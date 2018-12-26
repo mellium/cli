@@ -6,11 +6,11 @@ package cli
 
 import (
 	"fmt"
-	"os"
 )
 
 // Help returns a Command that prints help information about its command set to
-// stdout, or about a specific command if one is provided as an argument.
+// the command's Help output, or information about a specific command if one is
+// provided as an argument.
 //
 // For example, in a program called "git" running:
 //
@@ -24,7 +24,7 @@ func Help(cs *Command) *Command {
 		Run: func(c *Command, args ...string) error {
 			// If there aren't any arguments, print the main command help.
 			if len(args) == 0 {
-				cs.Help(os.Stdout)
+				cs.Help()
 				return nil
 			}
 
@@ -35,7 +35,7 @@ func Help(cs *Command) *Command {
 				}
 				// If this is the article, run its help command.
 				if len(args) == 1 {
-					cmd.Help(os.Stdout)
+					cmd.Help()
 					return nil
 				}
 

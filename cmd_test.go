@@ -39,11 +39,12 @@ func TestCommand(t *testing.T) {
 			}
 		})
 		t.Run(fmt.Sprintf("Help/%d", i), func(t *testing.T) {
-			tc.cmd.Flags = flag.NewFlagSet("testflags", flag.ExitOnError)
+			tc.cmd.Flags = flag.NewFlagSet("testflags", flag.PanicOnError)
 			tc.cmd.Flags.String("testflag", "testflagvalue", "usage of a test flag")
 
 			b.Reset()
-			tc.cmd.Help(b)
+			tc.cmd.Flags.SetOutput(b)
+			tc.cmd.Help()
 			if tc.cmd.Run != nil && !bytes.Contains(b.Bytes(), []byte(tc.cmd.Usage)) {
 				t.Errorf("Expected cmd.Help() output to contain cmd.Usage")
 			}
@@ -125,7 +126,11 @@ func TestCommandSet(t *testing.T) {
 		if tc.cs != nil {
 			t.Run(fmt.Sprintf("Help/%d", i), func(t *testing.T) {
 				b := new(bytes.Buffer)
-				tc.cs.Help(b)
+				if tc.cs.Flags == nil {
+					tc.cs.Flags = flag.NewFlagSet("t", flag.PanicOnError)
+				}
+				tc.cs.Flags.SetOutput(b)
+				tc.cs.Help()
 				for _, cmd := range tc.cs.Commands {
 					if !bytes.Contains(b.Bytes(), []byte(cmd.Name())) {
 						t.Errorf("Expected commandset help to contain command name: %s", cmd.Name())

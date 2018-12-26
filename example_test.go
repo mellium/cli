@@ -14,6 +14,7 @@ import (
 
 func commitCmd(cfg *string) *cli.Command {
 	commitFlags := flag.NewFlagSet("commit", flag.ExitOnError)
+	commitFlags.SetOutput(os.Stdout)
 	help := commitFlags.Bool("h", false, "Print this commands help output…")
 	interactive := commitFlags.Bool("interactive", false, "Run commit in interactive mode.")
 	if cfg == nil {
@@ -35,7 +36,7 @@ Stores the current contents of the index in a new commit…`,
 				fmt.Println("Interactive mode enabled.")
 			}
 			if *help {
-				c.Help(os.Stdout)
+				c.Help()
 			}
 			return nil
 		},
