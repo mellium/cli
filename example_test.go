@@ -28,6 +28,8 @@ func commitCmd(cfg *string) *cli.Command {
 Stores the current contents of the index in a new commit…`,
 		Flags: commitFlags,
 		Run: func(c *cli.Command, args ...string) error {
+			_ = commitFlags.Parse(args)
+
 			fmt.Printf("Using config file: %s\n", *cfg)
 			if *interactive {
 				fmt.Println("Interactive mode enabled.")
