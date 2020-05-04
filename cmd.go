@@ -24,6 +24,7 @@ import (
 	"strings"
 )
 
+// Common errors used in this package.
 var (
 	ErrInvalidCmd = errors.New("cli: no such command")
 	ErrNoRun      = errors.New("cli: no run function was specified for the command")
