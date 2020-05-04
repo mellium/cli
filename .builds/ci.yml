@@ -1,35 +1,35 @@
-image: freebsd
+image: freebsd/latest
 packages:
   - go
-environment:
-  GO111MODULE: 'on'
 sources:
   - https://git.sr.ht/~samwhited/cli
 tasks:
   - setup: |
-      export PATH=$(go env GOPATH)/bin:$PATH
-      echo 'export PATH=$(go env GOPATH)/bin:$PATH' >> ~/.buildenv
+      go version
+      go env
 
-      GO111MODULE=off go get golang.org/dl/go1.10.7
-      GO111MODULE=off go get golang.org/dl/go1.11.4
-      GO111MODULE=off go get golang.org/dl/gotip
-      go1.10.7 download
-      go1.11.4 download
-      gotip download
-  - vet: |
+      go get -u golang.org/x/lint/golint
+      go get -u github.com/securego/gosec/cmd/gosec
+      go get -u git.sr.ht/~samwhited/checkdoc
+
+      echo 'export PATH=$(go env GOPATH)/bin:$PATH' >> ~/.buildenv
+  - stable: |
+      cd cli/
+      go test -v -cover ./...
+  - lint: |
       cd cli/
       go vet ./...
-  - go110: |
-      mkdir -p `go env GOPATH`/src/mellium.im/
-      ln -s `pwd`/cli/ `go env GOPATH`/src/mellium.im/cli
-      cd `go env GOPATH`/src/mellium.im/cli
-      go1.10.7 env
-      go1.10.7 test -cover ./...
-  - go111: |
+      gofmt -s -l . && [ -z "$(gofmt -s -l .)" ]
+
+      golint -set_exit_status ./...
+      gosec ./...
+      checkdoc ./...
+  - validate: |
       cd cli/
-      go1.11.4 env
-      go1.11.4 test -cover ./...
-  - gotip: |
+      go mod tidy
+      git diff --exit-code -- go.mod go.sum
+  - tip: |
+      go get golang.org/dl/gotip
+      gotip download
       cd cli/
-      gotip env
-      gotip test -cover ./...
+      gotip test -v -cover ./...
