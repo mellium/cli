@@ -100,7 +100,7 @@ func (c *Command) Name() string {
 //
 //     The content to be added can be specified in several ways: …
 //
-// ShortDescr returns "Stores the current contents of the index."
+// ShortDesc returns "Stores the current contents of the index."
 func (c *Command) ShortDesc() string {
 	idx := strings.IndexByte(c.Description, '\n')
 	if idx == -1 {
