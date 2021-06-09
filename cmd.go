@@ -49,7 +49,7 @@ type Command struct {
 
 	// The action to take when this command is executed. The args will be the
 	// remaining command line args after all flags have been parsed.
-	// Run is normally called by a CommandSet and shouldn't be called directly.
+	// Run is normally called by the Exec method and shouldn't be called directly.
 	Run func(c *Command, args ...string) error
 }
 
