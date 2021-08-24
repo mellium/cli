@@ -1,10 +1,10 @@
 # cli
 
 [![GoDoc](https://godoc.org/mellium.im/cli?status.svg)](https://godoc.org/mellium.im/cli)
+[![Chat](https://inverse.chat/badge.svg?room=users@mellium.chat)](https://mellium.chat)
 [![License](https://img.shields.io/badge/license-FreeBSD-blue.svg)](https://opensource.org/licenses/BSD-2-Clause)
 
-[![Buy Me A Coffee](https://www.buymeacoffee.com/assets/img/custom_images/purple_img.png)](https://www.buymeacoffee.com/samwhited)
-[![Donate on Liberapay](https://liberapay.com/assets/widgets/donate.svg)](https://liberapay.com/SamWhited/donate)
+<a href="https://opencollective.com/mellium" alt="Donate on Open Collective"><img src="https://opencollective.com/mellium/donate/button@2x.png?color=blue" width="200"/></a>
 
 A simple library for writing applications with a command line interface.
 
