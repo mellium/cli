@@ -1,6 +1,6 @@
 // Copyright 2017 The Mellium Contributors.
-// Use of this source code is governed by the BSD 2-clause license that can be
-// found in the LICENSE file.
+// Use of this source code is governed by the BSD 2-clause
+// license that can be found in the LICENSE file.
 
 // Package cli can be used to create modern command line interfaces.
 //
@@ -10,7 +10,7 @@
 // For instance, if recreating the "git" command it might have a subcommand
 // called "commit" and each could have their own flags:
 //
-//     git -config mygit.config commit -interactive
+//	git -config mygit.config commit -interactive
 //
 // See the examples for more info.
 package cli // import "mellium.im/cli"
@@ -82,7 +82,7 @@ func (c *Command) Help() {
 // Name returns the first word of c.Usage which will be the name of the command.
 // For example with a usage line of:
 //
-//     commit [options]
+//	commit [options]
 //
 // Name returns "commit".
 func (c *Command) Name() string {
@@ -96,9 +96,9 @@ func (c *Command) Name() string {
 // ShortDesc returns the first line of c.Description.
 // For example, given the description:
 //
-//     Stores the current contents of the index.
+//	Stores the current contents of the index.
 //
-//     The content to be added can be specified in several ways: …
+//	The content to be added can be specified in several ways: …
 //
 // ShortDesc returns "Stores the current contents of the index."
 func (c *Command) ShortDesc() string {
